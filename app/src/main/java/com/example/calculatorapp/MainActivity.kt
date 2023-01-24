@@ -13,16 +13,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var buffer : Double = 0.0
-        var aux : Double = 0.0
-
-        var equalStatus : String = ""
-        var decStatus : Boolean = true
-
         var inputText = findViewById<TextView>(R.id.typeBox)
         var bufferText = findViewById<TextView>(R.id.bufferBox)
+
+        var buffer : Double = 0.0
+        var aux : Double = 0.0
+        var equalStatus : String = ""
+        var decStatus : Boolean = true
         var stringBuffer : String = ""
-        var stringAux: String = ""
+        var auxBuffer : String = ""
 
         val df = DecimalFormat("#.######")
         df.roundingMode = RoundingMode.CEILING
@@ -54,68 +53,80 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonZero.setOnClickListener() {
+
+            stringBuffer = inputText.text.toString()
             if (stringBuffer != "0") {
-                stringBuffer = inputText.text.toString()
                 stringBuffer += "0"
                 inputText.text = stringBuffer
             }
-            else if (stringBuffer == "0"){
-                stringBuffer = inputText.text.toString()
-                stringBuffer += "0"
-                inputText.text = stringBuffer.drop(1)
+            if (stringBuffer == "0"){
             }
+        }
+
+        fun skipZero() {
+            if (stringBuffer == "0")
+                stringBuffer = stringBuffer.substring(1)
         }
 
         buttonOne.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "1"
             inputText.text = stringBuffer
         }
 
         buttonTwo.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "2"
             inputText.text = stringBuffer
         }
 
         buttonThree.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "3"
             inputText.text = stringBuffer
         }
 
         buttonFour.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "4"
             inputText.text = stringBuffer
         }
 
         buttonFive.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "5"
             inputText.text = stringBuffer
         }
 
         buttonSix.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "6"
             inputText.text = stringBuffer
         }
 
         buttonSeven.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "7"
             inputText.text = stringBuffer
         }
 
         buttonEight.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "8"
             inputText.text = stringBuffer
         }
 
         buttonNine.setOnClickListener() {
             stringBuffer = inputText.text.toString()
+            skipZero()
             stringBuffer += "9"
             inputText.text = stringBuffer
         }
@@ -145,11 +156,14 @@ class MainActivity : AppCompatActivity() {
                 "plus" -> {
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
-                        buffer = stringBuffer.toDouble()
-                        aux += buffer
-                        buffer = 0.0
-                        inputText.text = df.format(aux)
-                        bufferText.text = ""
+                        if (stringBuffer != "") {
+                            buffer = stringBuffer.toDouble()
+                            aux += buffer
+                            buffer = 0.0
+                            inputText.text = df.format(aux)
+                            bufferText.text = ""
+                            aux = 0.0
+                        }
                     }
                     else{
 
@@ -157,6 +171,17 @@ class MainActivity : AppCompatActivity() {
                 }
                 "minus" -> {
                     aux -= buffer
+                    if (aux != 0.0) {
+                        stringBuffer = inputText.text.toString()
+                        if (stringBuffer != "") {
+                            buffer = stringBuffer.toDouble()
+                            aux -= buffer
+                            buffer = 0.0
+                            inputText.text = df.format(aux)
+                            bufferText.text = ""
+                            aux = 0.0
+                        }
+                    }
                 }
                 "times" -> {
                     aux *= buffer
@@ -178,24 +203,46 @@ class MainActivity : AppCompatActivity() {
 
         buttonPlus.setOnClickListener() {
             stringBuffer = inputText.text.toString()
-            buffer = stringBuffer.toDouble()
-            aux += buffer
-            buffer = 0.0
-            inputText.text = ""
-            //bufferText.text = aux.toString()
-            bufferText.text = df.format(aux)
-            equalStatus = "plus"
-            decStatus = true
+            if (stringBuffer != "") {
+                buffer = stringBuffer.toDouble()
+                aux = aux + buffer
+                buffer = 0.0
+                inputText.text = ""
+                bufferText.text = df.format(aux) + "+"
+                equalStatus = "plus"
+                decStatus = true
+            }
+            if (stringBuffer == "") {
+                auxBuffer = bufferText.text.toString()
+                inputText.text = "+"
+                if (auxBuffer != "")
+                    equalStatus = "plus"
+            }
+            if (stringBuffer == "+") {
+                println("nothing +")
+            }
         }
 
         buttonMinus.setOnClickListener() {
             stringBuffer = inputText.text.toString()
-            buffer = stringBuffer.toDouble()
-            aux -= buffer
-            inputText.text = ""
-            bufferText.text = stringBuffer
-            equalStatus = "minus"
-            decStatus = true
+            if (stringBuffer != "") {
+                buffer = stringBuffer.toDouble()
+                aux = aux + buffer
+                buffer = 0.0
+                inputText.text = ""
+                bufferText.text = df.format(aux) +  "-"
+                equalStatus = "minus"
+                decStatus = true
+            }
+            if (stringBuffer == "") {
+                auxBuffer = bufferText.text.toString()
+                inputText.text = "-"
+                if (auxBuffer != "")
+                    equalStatus = "minus"
+            }
+            if (stringBuffer == "-") {
+                println("nothing -")
+            }
         }
 
         buttonTimes.setOnClickListener() {
