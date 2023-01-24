@@ -33,7 +33,8 @@
         android:textColor="@color/design_default_color_error"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/eightButton"
@@ -150,7 +151,8 @@
         android:textColor="#33691E"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/sevenButton"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/timesButton"
@@ -165,7 +167,8 @@
         android:textColor="#33691E"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/eightButton"
-        app:layout_constraintStart_toEndOf="@+id/byButton" />
+        app:layout_constraintStart_toEndOf="@+id/byButton"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/minusButton"
@@ -180,7 +183,8 @@
         android:textColor="#33691E"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/plusButton"
-        app:layout_constraintStart_toEndOf="@+id/nineButton" />
+        app:layout_constraintStart_toEndOf="@+id/nineButton"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/plusButton"
@@ -195,7 +199,8 @@
         android:textColor="#33691E"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/equalButton"
-        app:layout_constraintStart_toEndOf="@+id/sixButton" />
+        app:layout_constraintStart_toEndOf="@+id/sixButton"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/equalButton"
@@ -214,7 +219,8 @@
         app:iconTint="@color/material_dynamic_neutral20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/threeButton" />
+        app:layout_constraintStart_toEndOf="@+id/threeButton"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/backSpaceButton"
@@ -229,7 +235,8 @@
         android:textColor="#33691E"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/nineButton"
-        app:layout_constraintStart_toEndOf="@+id/timesButton" />
+        app:layout_constraintStart_toEndOf="@+id/timesButton"
+        tools:ignore="TextContrastCheck" />
 
     <Button
         android:id="@+id/twoButton"
