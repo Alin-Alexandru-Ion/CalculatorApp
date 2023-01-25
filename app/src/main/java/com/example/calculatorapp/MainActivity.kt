@@ -13,15 +13,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var inputText = findViewById<TextView>(R.id.typeBox)
-        var bufferText = findViewById<TextView>(R.id.bufferBox)
+        val inputText = findViewById<TextView>(R.id.typeBox)
+        val bufferText = findViewById<TextView>(R.id.bufferBox)
 
-        var buffer : Double = 0.0
-        var aux : Double = 0.0
-        var equalStatus : String = ""
-        var decStatus : Boolean = true
-        var stringBuffer : String = ""
-        var auxBuffer : String = ""
+        var buffer = 0.0
+        var aux = 0.0
+        var auxMD  = 1.0
+        var equalStatus = ""
+        var decStatus = true
+        var stringBuffer = ""
+        var auxBuffer = ""
 
         val df = DecimalFormat("#.######")
         df.roundingMode = RoundingMode.CEILING
@@ -45,21 +46,15 @@ class MainActivity : AppCompatActivity() {
         val buttonTimes: Button = findViewById(R.id.timesButton)
         val buttonBy: Button = findViewById(R.id.byButton)
 
-        if (inputText.text == "") {
-            Log.e("Error: ", "Invalid operation")
-        }
-        else if (inputText.text != "") {
-            println("Toate functiile plus minus blablabla")
-        }
-
-        buttonZero.setOnClickListener() {
+        buttonZero.setOnClickListener {
 
             stringBuffer = inputText.text.toString()
             if (stringBuffer != "0") {
                 stringBuffer += "0"
                 inputText.text = stringBuffer
             }
-            if (stringBuffer == "0"){
+            if (stringBuffer == "0") {
+
             }
         }
 
@@ -68,80 +63,81 @@ class MainActivity : AppCompatActivity() {
                 stringBuffer = stringBuffer.substring(1)
         }
 
-        buttonOne.setOnClickListener() {
+        buttonOne.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "1"
             inputText.text = stringBuffer
         }
 
-        buttonTwo.setOnClickListener() {
+        buttonTwo.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "2"
             inputText.text = stringBuffer
         }
 
-        buttonThree.setOnClickListener() {
+        buttonThree.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "3"
             inputText.text = stringBuffer
         }
 
-        buttonFour.setOnClickListener() {
+        buttonFour.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "4"
             inputText.text = stringBuffer
         }
 
-        buttonFive.setOnClickListener() {
+        buttonFive.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "5"
             inputText.text = stringBuffer
         }
 
-        buttonSix.setOnClickListener() {
+        buttonSix.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "6"
             inputText.text = stringBuffer
         }
 
-        buttonSeven.setOnClickListener() {
+        buttonSeven.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "7"
             inputText.text = stringBuffer
         }
 
-        buttonEight.setOnClickListener() {
+        buttonEight.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "8"
             inputText.text = stringBuffer
         }
 
-        buttonNine.setOnClickListener() {
+        buttonNine.setOnClickListener {
             stringBuffer = inputText.text.toString()
             skipZero()
             stringBuffer += "9"
             inputText.text = stringBuffer
         }
 
-        buttonClear.setOnClickListener() {
+        buttonClear.setOnClickListener {
             inputText.text = ""
             bufferText.text = ""
             buffer = 0.0
             aux = 0.0
+            auxMD = 1.0
             equalStatus = ""
             decStatus = true
         }
 
-        buttonDecimal.setOnClickListener() {
-            if (decStatus == false)
+        buttonDecimal.setOnClickListener {
+            if (!decStatus)
                 Log.e("Error: ", "Invalid operation")
             else {
                 stringBuffer = inputText.text.toString()
@@ -151,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        buttonEqual.setOnClickListener() {
+        buttonEqual.setOnClickListener {
             when (equalStatus) {
                 "plus" -> {
                     if (aux != 0.0) {
@@ -165,12 +161,9 @@ class MainActivity : AppCompatActivity() {
                             aux = 0.0
                         }
                     }
-                    else{
-
-                    }
                 }
                 "minus" -> {
-                    aux -= buffer
+                    //aux -= buffer
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
                         if (stringBuffer != "") {
@@ -184,16 +177,36 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "times" -> {
-                    aux *= buffer
+                    if (aux != 0.0) {
+                        stringBuffer = inputText.text.toString()
+                        if (stringBuffer != "") {
+                            buffer = stringBuffer.toDouble()
+                            aux = auxMD * buffer
+                            inputText.text = df.format(aux)
+                            bufferText.text = ""
+                            aux = 0.0
+                            auxMD = 1.0
+                        }
+                    }
                 }
                 "by" -> {
-                    aux /= buffer
+                    if (aux != 0.0) {
+                        stringBuffer = inputText.text.toString()
+                        if (stringBuffer != "") {
+                            buffer = stringBuffer.toDouble()
+                            aux = auxMD / buffer
+                            inputText.text = df.format(aux)
+                            bufferText.text = ""
+                            aux = 0.0
+                            auxMD = 1.0
+                        }
+                    }
                 }
                 else -> Log.e("Error: ", "Invalid operation")
             }
         }
 
-        buttonBackSpace.setOnClickListener() {
+        buttonBackSpace.setOnClickListener {
             if(inputText.text != "") {
                 stringBuffer = inputText.text.toString().dropLast(1)
                 inputText.text = stringBuffer
@@ -201,14 +214,15 @@ class MainActivity : AppCompatActivity() {
             else println("already blank")
         }
 
-        buttonPlus.setOnClickListener() {
+        buttonPlus.setOnClickListener {
             stringBuffer = inputText.text.toString()
+            auxBuffer = bufferText.text.toString()
             if (stringBuffer != "") {
                 buffer = stringBuffer.toDouble()
-                aux = aux + buffer
+                aux += buffer
                 buffer = 0.0
                 inputText.text = ""
-                bufferText.text = df.format(aux) + "+"
+                bufferText.text = df.format(aux) + " +"
                 equalStatus = "plus"
                 decStatus = true
             }
@@ -218,19 +232,16 @@ class MainActivity : AppCompatActivity() {
                 if (auxBuffer != "")
                     equalStatus = "plus"
             }
-            if (stringBuffer == "+") {
-                println("nothing +")
-            }
         }
 
-        buttonMinus.setOnClickListener() {
+        buttonMinus.setOnClickListener {
             stringBuffer = inputText.text.toString()
             if (stringBuffer != "") {
                 buffer = stringBuffer.toDouble()
-                aux = aux + buffer
+                aux += buffer
                 buffer = 0.0
                 inputText.text = ""
-                bufferText.text = df.format(aux) +  "-"
+                bufferText.text = df.format(aux) +  " -"
                 equalStatus = "minus"
                 decStatus = true
             }
@@ -245,25 +256,30 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        buttonTimes.setOnClickListener() {
+        buttonTimes.setOnClickListener {
             stringBuffer = inputText.text.toString()
-            buffer = stringBuffer.toDouble()
-            aux *= buffer
-            inputText.text = ""
-            bufferText.text = stringBuffer
-            equalStatus = "times"
-            decStatus = true
+            if (stringBuffer != "") {
+                buffer = stringBuffer.toDouble()
+                aux = auxMD * buffer
+                inputText.text = ""
+                bufferText.text = df.format(aux) +  " x"
+                equalStatus = "times"
+                decStatus = true
+                auxMD = aux
+            }
         }
 
-        buttonBy.setOnClickListener() {
+        buttonBy.setOnClickListener {
             stringBuffer = inputText.text.toString()
-            buffer = stringBuffer.toDouble()
-            aux /= buffer
-            inputText.text = ""
-            bufferText.text = stringBuffer
-            equalStatus = "by"
-            decStatus = true
+            if (stringBuffer != "") {
+                buffer = stringBuffer.toDouble()
+                aux = buffer / auxMD
+                inputText.text = ""
+                bufferText.text = df.format(aux) + " ÷"
+                equalStatus = "by"
+                decStatus = true
+                auxMD = aux
+            }
         }
-
     }
 }
