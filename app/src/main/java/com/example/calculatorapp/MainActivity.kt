@@ -16,13 +16,14 @@ class MainActivity : AppCompatActivity() {
         val inputText = findViewById<TextView>(R.id.typeBox)
         val bufferText = findViewById<TextView>(R.id.bufferBox)
 
-        var buffer = 0.0
+        var buffer : Double
         var aux = 0.0
-        var auxMD  = 1.0
+        var auxM = 1.0
         var equalStatus = ""
         var decStatus = true
         var stringBuffer = ""
         var auxBuffer = ""
+        var divPass = true
 
         val df = DecimalFormat("#.######")
         df.roundingMode = RoundingMode.CEILING
@@ -131,7 +132,7 @@ class MainActivity : AppCompatActivity() {
             bufferText.text = ""
             buffer = 0.0
             aux = 0.0
-            auxMD = 1.0
+            auxM = 1.0
             equalStatus = ""
             decStatus = true
         }
@@ -161,9 +162,19 @@ class MainActivity : AppCompatActivity() {
                             aux = 0.0
                         }
                     }
+                    if (aux == 0.0) {
+                        auxBuffer = bufferText.text.toString()
+                        if (auxBuffer != "") {
+                            stringBuffer = inputText.text.toString()
+                            if (stringBuffer != "") {
+                                inputText.text = stringBuffer
+                                bufferText.text = ""
+                                aux = 0.0
+                            }
+                        }
+                    }
                 }
                 "minus" -> {
-                    //aux -= buffer
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
                         if (stringBuffer != "") {
@@ -175,34 +186,61 @@ class MainActivity : AppCompatActivity() {
                             aux = 0.0
                         }
                     }
+                    if (aux == 0.0) {
+                        auxBuffer = bufferText.text.toString()
+                        if (auxBuffer != "") {
+                            stringBuffer = inputText.text.toString()
+                            if (stringBuffer != "") {
+                                inputText.text = "-" + stringBuffer
+                                bufferText.text = ""
+                                aux = 0.0
+                            }
+                        }
+                    }
                 }
                 "times" -> {
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
                         if (stringBuffer != "") {
                             buffer = stringBuffer.toDouble()
-                            aux = auxMD * buffer
+                            aux = auxM * buffer
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             aux = 0.0
-                            auxMD = 1.0
+                            auxM = 1.0
+                        }
+                    }
+                    if (aux == 0.0) {
+                        auxBuffer = bufferText.text.toString()
+                        if (auxBuffer != "") {
+                            inputText.text = "0"
+                            bufferText.text = ""
+                            aux = 0.0
+                            auxM = 1.0
                         }
                     }
                 }
                 "by" -> {
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
-                        if (stringBuffer != "") {
+                        if (stringBuffer != ""){
                             buffer = stringBuffer.toDouble()
-                            aux = auxMD / buffer
+                            aux = aux / buffer
                             inputText.text = df.format(aux)
                             bufferText.text = ""
-                            aux = 0.0
-                            auxMD = 1.0
+                            decStatus = true
+                            divPass = true
+                        }
+                    }
+                    if (aux == 0.0) {
+                        auxBuffer = bufferText.text.toString()
+                        if (auxBuffer != "") {
+                            divPass = true
+                            //Toast invalid operation
                         }
                     }
                 }
-                else -> Log.e("Error: ", "Invalid operation")
+                else -> Log.e("Error: ", "Invalid operation") //Toast invalid operation
             }
         }
 
@@ -211,7 +249,9 @@ class MainActivity : AppCompatActivity() {
                 stringBuffer = inputText.text.toString().dropLast(1)
                 inputText.text = stringBuffer
             }
-            else println("already blank")
+            else {
+                //Toast already empty
+            }
         }
 
         buttonPlus.setOnClickListener {
@@ -226,17 +266,14 @@ class MainActivity : AppCompatActivity() {
                 equalStatus = "plus"
                 decStatus = true
             }
-            if (stringBuffer == "") {
-                auxBuffer = bufferText.text.toString()
-                inputText.text = "+"
-                if (auxBuffer != "")
-                    equalStatus = "plus"
-            }
         }
 
         buttonMinus.setOnClickListener {
             stringBuffer = inputText.text.toString()
-            if (stringBuffer != "") {
+            if (stringBuffer == "-") {
+                //Toast invalid operation
+            }
+            else if (stringBuffer != "") {
                 buffer = stringBuffer.toDouble()
                 aux += buffer
                 buffer = 0.0
@@ -248,11 +285,9 @@ class MainActivity : AppCompatActivity() {
             if (stringBuffer == "") {
                 auxBuffer = bufferText.text.toString()
                 inputText.text = "-"
-                if (auxBuffer != "")
+                if (auxBuffer != "") {
                     equalStatus = "minus"
-            }
-            if (stringBuffer == "-") {
-                println("nothing -")
+                }
             }
         }
 
@@ -260,12 +295,12 @@ class MainActivity : AppCompatActivity() {
             stringBuffer = inputText.text.toString()
             if (stringBuffer != "") {
                 buffer = stringBuffer.toDouble()
-                aux = auxMD * buffer
+                aux = auxM * buffer
                 inputText.text = ""
                 bufferText.text = df.format(aux) +  " x"
                 equalStatus = "times"
                 decStatus = true
-                auxMD = aux
+                auxM = aux
             }
         }
 
@@ -273,12 +308,21 @@ class MainActivity : AppCompatActivity() {
             stringBuffer = inputText.text.toString()
             if (stringBuffer != "") {
                 buffer = stringBuffer.toDouble()
-                aux = buffer / auxMD
-                inputText.text = ""
-                bufferText.text = df.format(aux) + " ÷"
-                equalStatus = "by"
-                decStatus = true
-                auxMD = aux
+                if (divPass) {
+                    aux = buffer
+                    divPass = false
+                    inputText.text = ""
+                    bufferText.text = df.format(aux) +  " ÷"
+                    equalStatus = "by"
+                    decStatus = true
+                }
+                else {
+                    aux = aux / buffer
+                    inputText.text = ""
+                    bufferText.text = df.format(aux) +  " ÷"
+                    equalStatus = "by"
+                    decStatus = true
+                }
             }
         }
     }
