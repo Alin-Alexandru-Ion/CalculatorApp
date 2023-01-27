@@ -5,9 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -27,10 +25,13 @@ class MainActivity : AppCompatActivity() {
         var buffer : Double
         var aux = 0.0
         var auxM = 1.0
-        var equalStatus = ""
-        var decStatus = true
+
         var stringBuffer = ""
         var auxBuffer: String
+        var equalStatus = ""
+
+        var decStatus = true
+        var decrementPass = true
         var divPass = true
         var plusAccess = true
         var minusAccess = true
@@ -59,16 +60,13 @@ class MainActivity : AppCompatActivity() {
         val buttonTimes: Button = findViewById(R.id.timesButton)
         val buttonBy: Button = findViewById(R.id.byButton)
 
+        val myCustomFont : Typeface? = ResourcesCompat.getFont(this, R.font.cabin)
+
         @Suppress("KotlinConstantConditions")
         fun snacks(str: String) {
             val snack: Snackbar = Snackbar.make(findViewById(android.R.id.content), str, 750)
             val view = snack.view
-            val params = view.layoutParams as FrameLayout.LayoutParams
-            params.gravity = Gravity.TOP
-            view.layoutParams = params
-            val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-            val myCustomFont : Typeface? = ResourcesCompat.getFont(this, R.font.cabin)
-            when (currentNightMode) {
+            when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_NO -> {
                     snack.view.setBackgroundColor(Color.parseColor("#DDDDDD"))
                     snack.setTextColor(Color.parseColor("#333333"))
@@ -81,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             val tv = view.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
             tv.typeface = myCustomFont
             tv.textSize = 18f
+            snack.anchorView = bufferText
             snack.show()
         }
 
@@ -173,6 +172,7 @@ class MainActivity : AppCompatActivity() {
             aux = 0.0
             auxM = 1.0
             equalStatus = ""
+            decrementPass = true
             decStatus = true
             plusAccess = true
             minusAccess = true
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
 
         buttonDecimal.setOnClickListener {
             if (!decStatus)
-                snacks("Invalid operation")
+                snacks("Decimal already placed")
             else {
                 stringBuffer = inputText.text.toString()
                 stringBuffer += "."
@@ -204,6 +204,7 @@ class MainActivity : AppCompatActivity() {
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             aux = 0.0
+                            decrementPass = true
                         }
                     }
                     if (aux == 0.0) {
@@ -231,6 +232,7 @@ class MainActivity : AppCompatActivity() {
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             aux = 0.0
+                            decrementPass = true
                         }
                     }
                     if (aux == 0.0) {
@@ -254,10 +256,12 @@ class MainActivity : AppCompatActivity() {
                         if (stringBuffer != "") {
                             buffer = stringBuffer.toDouble()
                             aux = auxM * buffer
+                            buffer = 0.0
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             aux = 0.0
                             auxM = 1.0
+                            decrementPass = true
                         }
                     }
                     if (aux == 0.0) {
@@ -279,11 +283,12 @@ class MainActivity : AppCompatActivity() {
                         if (stringBuffer != ""){
                             buffer = stringBuffer.toDouble()
                             aux /= buffer
+                            buffer = 0.0
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             aux = 0.0
-                            decStatus = true
                             divPass = true
+                            decrementPass = true
                         }
                     }
                     else if (aux == 0.0) {
@@ -305,6 +310,9 @@ class MainActivity : AppCompatActivity() {
             stringBuffer = inputText.text.toString()
             if(stringBuffer != "") {
                 stringBuffer = inputText.text.toString().dropLast(1)
+                if (stringBuffer.takeLast(1) == ".") {
+                    decStatus = true
+                }
                 inputText.text = stringBuffer
             }
             else {
@@ -327,6 +335,16 @@ class MainActivity : AppCompatActivity() {
                     timesAccess = false
                     byAccess = false
                 }
+                if (aux == 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
+                    }
+                }
+                if (aux != 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
+                    }
+                }
             }
             else {
                 snacks("Another operation in course")
@@ -337,7 +355,7 @@ class MainActivity : AppCompatActivity() {
             if (minusAccess) {
                 stringBuffer = inputText.text.toString()
                 if (stringBuffer == "-") {
-                    snacks("Type in a negative number")
+                    snacks("Type in number before")
                 }
                 else if (stringBuffer != "") {
                     buffer = stringBuffer.toDouble()
@@ -351,11 +369,24 @@ class MainActivity : AppCompatActivity() {
                     timesAccess = false
                     byAccess = false
                 }
-                if (stringBuffer == "") {
-                    auxBuffer = bufferText.text.toString()
-                    inputText.text = "-"
-                    if (auxBuffer != "") {
-                        equalStatus = "minus"
+                if (decrementPass) {
+                    if (stringBuffer == "") {
+                        auxBuffer = bufferText.text.toString()
+                        inputText.text = "-"
+                        if (auxBuffer != "") {
+                            equalStatus = "minus"
+                        }
+                    }
+                    decrementPass = false
+                }
+                if (aux == 0.0) {
+                    if (stringBuffer != "-" && stringBuffer != "") {
+                        snacks("Type in number before")
+                    }
+                }
+                if (aux != 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
                     }
                 }
             }
@@ -370,6 +401,7 @@ class MainActivity : AppCompatActivity() {
                 if (stringBuffer != "") {
                     buffer = stringBuffer.toDouble()
                     aux = auxM * buffer
+                    buffer = 0.0
                     inputText.text = ""
                     bufferText.text = df.format(aux) + " x"
                     equalStatus = "times"
@@ -378,6 +410,16 @@ class MainActivity : AppCompatActivity() {
                     plusAccess = false
                     minusAccess = false
                     byAccess = false
+                }
+                if (aux == 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
+                    }
+                }
+                if (aux != 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
+                    }
                 }
             }
             else {
@@ -392,6 +434,7 @@ class MainActivity : AppCompatActivity() {
                     buffer = stringBuffer.toDouble()
                     if (divPass) {
                         aux = buffer
+                        buffer = 0.0
                         divPass = false
                         inputText.text = ""
                         bufferText.text = df.format(aux) + " ÷"
@@ -402,6 +445,7 @@ class MainActivity : AppCompatActivity() {
                         timesAccess = false
                     } else {
                         aux /= buffer
+                        buffer = 0.0
                         inputText.text = ""
                         bufferText.text = df.format(aux) + " ÷"
                         equalStatus = "by"
@@ -409,6 +453,16 @@ class MainActivity : AppCompatActivity() {
                         plusAccess = false
                         minusAccess = false
                         timesAccess = false
+                    }
+                }
+                if (aux == 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
+                    }
+                }
+                if (aux != 0.0) {
+                    if (stringBuffer == "") {
+                        snacks("Type in number before")
                     }
                 }
             }
