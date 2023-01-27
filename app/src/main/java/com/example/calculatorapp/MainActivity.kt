@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.widget.Button
 import android.widget.FrameLayout
@@ -15,7 +14,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.snackbar.Snackbar
 import java.math.RoundingMode
 import java.text.DecimalFormat
-
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
@@ -176,11 +174,15 @@ class MainActivity : AppCompatActivity() {
             auxM = 1.0
             equalStatus = ""
             decStatus = true
+            plusAccess = true
+            minusAccess = true
+            timesAccess = true
+            byAccess = true
         }
 
         buttonDecimal.setOnClickListener {
             if (!decStatus)
-                Log.e("Error: ", "Invalid operation")
+                snacks("Invalid operation")
             else {
                 stringBuffer = inputText.text.toString()
                 stringBuffer += "."
@@ -189,6 +191,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        @Suppress("KotlinConstantConditions")
         buttonEqual.setOnClickListener {
             when (equalStatus) {
                 "plus" -> {
@@ -278,6 +281,7 @@ class MainActivity : AppCompatActivity() {
                             aux /= buffer
                             inputText.text = df.format(aux)
                             bufferText.text = ""
+                            aux = 0.0
                             decStatus = true
                             divPass = true
                         }
@@ -333,7 +337,7 @@ class MainActivity : AppCompatActivity() {
             if (minusAccess) {
                 stringBuffer = inputText.text.toString()
                 if (stringBuffer == "-") {
-                    snacks("Already empty")
+                    snacks("Type in a negative number")
                 }
                 else if (stringBuffer != "") {
                     buffer = stringBuffer.toDouble()
