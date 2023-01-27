@@ -1,14 +1,24 @@
 package com.example.calculatorapp
 
+import android.annotation.SuppressLint
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.snackbar.Snackbar
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
+
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -22,8 +32,12 @@ class MainActivity : AppCompatActivity() {
         var equalStatus = ""
         var decStatus = true
         var stringBuffer = ""
-        var auxBuffer = ""
+        var auxBuffer: String
         var divPass = true
+        var plusAccess = true
+        var minusAccess = true
+        var timesAccess = true
+        var byAccess = true
 
         val df = DecimalFormat("#.######")
         df.roundingMode = RoundingMode.CEILING
@@ -47,6 +61,38 @@ class MainActivity : AppCompatActivity() {
         val buttonTimes: Button = findViewById(R.id.timesButton)
         val buttonBy: Button = findViewById(R.id.byButton)
 
+        @Suppress("KotlinConstantConditions")
+        fun snacks(str: String) {
+            val snack: Snackbar = Snackbar.make(findViewById(android.R.id.content), str, 750)
+            val view = snack.view
+            val params = view.layoutParams as FrameLayout.LayoutParams
+            params.gravity = Gravity.TOP
+            view.layoutParams = params
+            val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            val myCustomFont : Typeface? = ResourcesCompat.getFont(this, R.font.cabin)
+            when (currentNightMode) {
+                Configuration.UI_MODE_NIGHT_NO -> {
+                    snack.view.setBackgroundColor(Color.parseColor("#DDDDDD"))
+                    snack.setTextColor(Color.parseColor("#333333"))
+                }
+                Configuration.UI_MODE_NIGHT_YES -> {
+                    snack.view.setBackgroundColor(Color.parseColor("#333333"))
+                    snack.setTextColor(Color.parseColor("#DDDDDD"))
+                }
+            }
+            val tv = view.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+            tv.typeface = myCustomFont
+            tv.textSize = 18f
+            snack.show()
+        }
+
+        fun skipZero() {
+            if (stringBuffer == "0") {
+                stringBuffer = stringBuffer.substring(1)
+            }
+        }
+
+        @Suppress("KotlinConstantConditions")
         buttonZero.setOnClickListener {
 
             stringBuffer = inputText.text.toString()
@@ -54,14 +100,9 @@ class MainActivity : AppCompatActivity() {
                 stringBuffer += "0"
                 inputText.text = stringBuffer
             }
-            if (stringBuffer == "0") {
-
+            else if (stringBuffer == "0") {
+                snacks("Can't type any more 0")
             }
-        }
-
-        fun skipZero() {
-            if (stringBuffer == "0")
-                stringBuffer = stringBuffer.substring(1)
         }
 
         buttonOne.setOnClickListener {
@@ -173,6 +214,9 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
+                    minusAccess = true
+                    timesAccess = true
+                    byAccess = true
                 }
                 "minus" -> {
                     if (aux != 0.0) {
@@ -191,12 +235,15 @@ class MainActivity : AppCompatActivity() {
                         if (auxBuffer != "") {
                             stringBuffer = inputText.text.toString()
                             if (stringBuffer != "") {
-                                inputText.text = "-" + stringBuffer
+                                inputText.text = "-$stringBuffer"
                                 bufferText.text = ""
                                 aux = 0.0
                             }
                         }
                     }
+                    plusAccess = true
+                    timesAccess = true
+                    byAccess = true
                 }
                 "times" -> {
                     if (aux != 0.0) {
@@ -219,110 +266,150 @@ class MainActivity : AppCompatActivity() {
                             auxM = 1.0
                         }
                     }
+                    plusAccess = true
+                    minusAccess = true
+                    byAccess = true
                 }
                 "by" -> {
                     if (aux != 0.0) {
                         stringBuffer = inputText.text.toString()
                         if (stringBuffer != ""){
                             buffer = stringBuffer.toDouble()
-                            aux = aux / buffer
+                            aux /= buffer
                             inputText.text = df.format(aux)
                             bufferText.text = ""
                             decStatus = true
                             divPass = true
                         }
                     }
-                    if (aux == 0.0) {
+                    else if (aux == 0.0) {
                         auxBuffer = bufferText.text.toString()
                         if (auxBuffer != "") {
                             divPass = true
-                            //Toast invalid operation
+                            snacks("Invalid operation")
                         }
                     }
+                    plusAccess = true
+                    minusAccess = true
+                    timesAccess = true
                 }
-                else -> Log.e("Error: ", "Invalid operation") //Toast invalid operation
+                else -> snacks("Invalid operation")
             }
         }
 
         buttonBackSpace.setOnClickListener {
-            if(inputText.text != "") {
+            stringBuffer = inputText.text.toString()
+            if(stringBuffer != "") {
                 stringBuffer = inputText.text.toString().dropLast(1)
                 inputText.text = stringBuffer
             }
             else {
-                //Toast already empty
+                snacks("Already empty")
             }
         }
 
         buttonPlus.setOnClickListener {
-            stringBuffer = inputText.text.toString()
-            auxBuffer = bufferText.text.toString()
-            if (stringBuffer != "") {
-                buffer = stringBuffer.toDouble()
-                aux += buffer
-                buffer = 0.0
-                inputText.text = ""
-                bufferText.text = df.format(aux) + " +"
-                equalStatus = "plus"
-                decStatus = true
+            if (plusAccess) {
+                stringBuffer = inputText.text.toString()
+                if (stringBuffer != "") {
+                    buffer = stringBuffer.toDouble()
+                    aux += buffer
+                    buffer = 0.0
+                    inputText.text = ""
+                    bufferText.text = df.format(aux) + " +"
+                    equalStatus = "plus"
+                    decStatus = true
+                    minusAccess = false
+                    timesAccess = false
+                    byAccess = false
+                }
+            }
+            else {
+                snacks("Another operation in course")
             }
         }
 
         buttonMinus.setOnClickListener {
-            stringBuffer = inputText.text.toString()
-            if (stringBuffer == "-") {
-                //Toast invalid operation
-            }
-            else if (stringBuffer != "") {
-                buffer = stringBuffer.toDouble()
-                aux += buffer
-                buffer = 0.0
-                inputText.text = ""
-                bufferText.text = df.format(aux) +  " -"
-                equalStatus = "minus"
-                decStatus = true
-            }
-            if (stringBuffer == "") {
-                auxBuffer = bufferText.text.toString()
-                inputText.text = "-"
-                if (auxBuffer != "") {
-                    equalStatus = "minus"
+            if (minusAccess) {
+                stringBuffer = inputText.text.toString()
+                if (stringBuffer == "-") {
+                    snacks("Already empty")
                 }
+                else if (stringBuffer != "") {
+                    buffer = stringBuffer.toDouble()
+                    aux += buffer
+                    buffer = 0.0
+                    inputText.text = ""
+                    bufferText.text = df.format(aux) + " -"
+                    equalStatus = "minus"
+                    decStatus = true
+                    plusAccess = false
+                    timesAccess = false
+                    byAccess = false
+                }
+                if (stringBuffer == "") {
+                    auxBuffer = bufferText.text.toString()
+                    inputText.text = "-"
+                    if (auxBuffer != "") {
+                        equalStatus = "minus"
+                    }
+                }
+            }
+            else {
+                snacks("Another operation in course")
             }
         }
 
         buttonTimes.setOnClickListener {
-            stringBuffer = inputText.text.toString()
-            if (stringBuffer != "") {
-                buffer = stringBuffer.toDouble()
-                aux = auxM * buffer
-                inputText.text = ""
-                bufferText.text = df.format(aux) +  " x"
-                equalStatus = "times"
-                decStatus = true
-                auxM = aux
+            if (timesAccess) {
+                stringBuffer = inputText.text.toString()
+                if (stringBuffer != "") {
+                    buffer = stringBuffer.toDouble()
+                    aux = auxM * buffer
+                    inputText.text = ""
+                    bufferText.text = df.format(aux) + " x"
+                    equalStatus = "times"
+                    decStatus = true
+                    auxM = aux
+                    plusAccess = false
+                    minusAccess = false
+                    byAccess = false
+                }
+            }
+            else {
+                snacks("Another operation in course")
             }
         }
 
         buttonBy.setOnClickListener {
-            stringBuffer = inputText.text.toString()
-            if (stringBuffer != "") {
-                buffer = stringBuffer.toDouble()
-                if (divPass) {
-                    aux = buffer
-                    divPass = false
-                    inputText.text = ""
-                    bufferText.text = df.format(aux) +  " ÷"
-                    equalStatus = "by"
-                    decStatus = true
+            if (byAccess) {
+                stringBuffer = inputText.text.toString()
+                if (stringBuffer != "") {
+                    buffer = stringBuffer.toDouble()
+                    if (divPass) {
+                        aux = buffer
+                        divPass = false
+                        inputText.text = ""
+                        bufferText.text = df.format(aux) + " ÷"
+                        equalStatus = "by"
+                        decStatus = true
+                        plusAccess = false
+                        minusAccess = false
+                        timesAccess = false
+                    } else {
+                        aux /= buffer
+                        inputText.text = ""
+                        bufferText.text = df.format(aux) + " ÷"
+                        equalStatus = "by"
+                        decStatus = true
+                        plusAccess = false
+                        minusAccess = false
+                        timesAccess = false
+                    }
                 }
-                else {
-                    aux = aux / buffer
-                    inputText.text = ""
-                    bufferText.text = df.format(aux) +  " ÷"
-                    equalStatus = "by"
-                    decStatus = true
-                }
+            }
+            else {
+                snacks("Another operation in course")
             }
         }
     }
