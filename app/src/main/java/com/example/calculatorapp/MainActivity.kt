@@ -184,9 +184,7 @@ class MainActivity : AppCompatActivity() {
             if (!decStatus)
                 snacks("Decimal already placed")
             else {
-                stringBuffer = inputText.text.toString()
-                stringBuffer += "."
-                inputText.text = stringBuffer
+                inputText.text = inputText.text.toString() + "."
                 decStatus = false
             }
         }
@@ -309,10 +307,10 @@ class MainActivity : AppCompatActivity() {
         buttonBackSpace.setOnClickListener {
             stringBuffer = inputText.text.toString()
             if(stringBuffer != "") {
-                stringBuffer = inputText.text.toString().dropLast(1)
                 if (stringBuffer.takeLast(1) == ".") {
                     decStatus = true
                 }
+                stringBuffer = inputText.text.toString().dropLast(1)
                 inputText.text = stringBuffer
             }
             else {
